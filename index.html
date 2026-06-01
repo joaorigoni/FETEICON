@@ -220,14 +220,14 @@ document.getElementById('submit-btn').addEventListener('click', function(){
 
   btn.disabled=true; btn.textContent='Sending…';
 
-  fetch('https://formspree.io/f/xwpbgdqn',{
+ fetch('https://api.web3forms.com/submit',{
     method:'POST',
     headers:{'Content-Type':'application/json','Accept':'application/json'},
-    body:JSON.stringify({name:name,email:email,phone:phone||'—',_subject:'RSVP — Fête de la musique'})
+    body:JSON.stringify({access_key:'c9cddeae-30e7-4fb9-8306-ac5c31badd47',name:name,email:email,phone:phone||'—',subject:'RSVP — Fête de la musique'})
   })
   .then(r=>r.json())
   .then(data=>{
-    if(data.ok||data.next){
+    if(data.success){
       msg.textContent='Présence confirmée — merci !';
       msg.style.color='#555';
       document.getElementById('f-name').value='';
