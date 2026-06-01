@@ -322,7 +322,7 @@ const canvas = document.getElementById('clock');
 const ctx    = canvas.getContext('2d');
 
 function sizeCanvas(){
-  const sz = Math.max(window.innerWidth, window.innerHeight) * 1.1;
+  const sz = Math.max(window.innerWidth, window.innerHeight) * 0.7;
   canvas.width = canvas.height = sz;
 }
 sizeCanvas();
@@ -332,7 +332,7 @@ function drawClock(){
   const sz = canvas.width;
   ctx.clearRect(0, 0, sz, sz);
   const cx = sz / 2, cy = sz / 2;
-  const outerR = sz * 0.46;
+  const outerR = sz * 0.44;
 
   // Ring
   ctx.beginPath();
