@@ -15,12 +15,9 @@
   }
 
   /* ============================================================
-     CLOCK BG — compartilhado
+     CLOCK BG — desktop: fixed | mobile: dentro do clock-spacer
   ============================================================ */
   #clock-bg {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
     pointer-events: none;
     z-index: 0;
   }
@@ -31,6 +28,12 @@
   @media (min-width: 768px) {
     html, body { height: 100%; overflow: hidden; }
 
+    #clock-bg {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
     .page {
       position: relative;
       z-index: 10;
@@ -39,7 +42,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1.2fr;
       grid-template-rows: auto 1fr auto;
-      padding: 20px 80px 20px 24px;
+      padding: 20px 80px 48px 24px;
     }
 
     /* TOP */
@@ -157,10 +160,19 @@
       letter-spacing:0.04em; text-align:right; white-space:nowrap;
     }
 
-    /* espaço do relógio */
+    /* espaço do relógio — contém o canvas no mobile */
     .clock-spacer {
       display: block;
+      position: relative;
       min-height: 52vw;
+    }
+
+    /* relógio segue o scroll no mobile (não cobre o formulário) */
+    #clock-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
 
     /* INFO SECTION mobile */
