@@ -263,8 +263,7 @@
     <!-- só mobile -->
     <div class="mob-header-right">
       <span class="mob-header-label">Fête de la musique</span>
-      <span class="mob-counter" id="mob-counter">D-- H-- S--</span>
-      <span class="mob-days"    id="mob-days">-- days left</span>
+      <span class="mob-days" id="mob-days">-- days left</span>
     </div>
   </header>
 
@@ -343,30 +342,49 @@
 
 <script>
 const TARGET = new Date('2026-06-21T14:00:00+02:00');
-function pad(n){ return String(Math.max(0,Math.floor(n))).padStart(2,'0'); }
-function getDiff(){
-  const ms = Math.max(0, TARGET - Date.now()), t = ms/1000;
-  return { days:Math.floor(t/86400), hrs:Math.floor((t%86400)/3600), mins:Math.floor((t%3600)/60), secs:Math.floor(t%60) };
+
+// Retorna a data atual no fuso de Paris (YYYY-MM-DD)
+function todayParis(){
+  return new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+}
+
+// Calcula quantos dias COMPLETOS de calendário faltam até 21/06 em Paris
+function daysLeftParis(){
+  const today = todayParis();                      // ex: "2026-06-18"
+  const event = '2026-06-21';
+  const msDay = 86400000;
+  const diff  = (new Date(event) - new Date(today)) / msDay;
+  return Math.max(0, Math.round(diff));
+}
+
+function getLabel(){
+  const days = daysLeftParis();
+  if      (days >= 2) return { counter: days + ' days left', days: days + ' days left' };
+  else if (days === 1) return { counter: 'AMANHÃ',           days: 'AMANHÃ' };
+  else                 return { counter: 'HOJE',             days: 'HOJE' };
 }
 
 function updateCounter(){
-  const d = getDiff();
-  const cStr = 'D'+pad(d.days)+' H'+pad(d.hrs)+' S'+pad(d.secs);
-  const dStr = d.days+' days left';
+  const { counter, days } = getLabel();
   // desktop
-  document.getElementById('counter').textContent   = cStr;
-  document.getElementById('days-left').textContent = dStr;
+  document.getElementById('counter').textContent   = counter;
+  document.getElementById('days-left').textContent = days;
   // mobile
-  document.getElementById('mob-counter').textContent = cStr;
-  document.getElementById('mob-days').textContent    = dStr;
+  document.getElementById('mob-days').textContent    = days;
 }
 updateCounter();
-setInterval(updateCounter, 1000);
+setInterval(updateCounter, 60000); // atualiza a cada minuto (não precisa de segundo)
 
 /* -------- CLOCK -------- */
 const canvas = document.getElementById('clock');
 const ctx    = canvas.getContext('2d');
 const isMob  = () => window.innerWidth < 768;
+
+// Diff de tempo real para os ponteiros do relógio
+function clockDiff(){
+  const ms = Math.max(0, TARGET - Date.now()), t = ms/1000;
+  return { hrs:Math.floor((t%86400)/3600), mins:Math.floor((t%3600)/60), secs:Math.floor(t%60) };
+}
 
 function sizeCanvas(){
   const sz = isMob()
@@ -400,7 +418,7 @@ function drawClock(){
   }
   // mobile: sem círculo, sem marcações — só ponteiros
 
-  const d=getDiff();
+  const d=clockDiff();
   const msNow=Date.now()%1000;
   const secA=((d.secs+msNow/1000)/60)*Math.PI*2-Math.PI/2;
   const hrA =((d.hrs%24)/24+d.mins/1440)*Math.PI*2-Math.PI/2;
