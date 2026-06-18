@@ -19,7 +19,11 @@
   ============================================================ */
   #clock-bg {
     pointer-events: none;
-    z-index: 0;
+    z-index: 1;
+  }
+  #clock {
+    display: block;
+    background: transparent;
   }
 
   /* ============================================================
@@ -29,9 +33,13 @@
     html, body { height: 100%; overflow: hidden; }
 
     #clock-bg {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
+      grid-column: 2 / 4;
+      grid-row: 1 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      pointer-events: none;
     }
 
     .page {
@@ -74,7 +82,7 @@
     .venue-name { font-size:12px; font-weight:700; margin-bottom:6px; }
     .venue-addr { font-size:12px; line-height:1.7; }
 
-    .bot-form  { grid-column:4; grid-row:3; padding-top:20px; display:flex; flex-direction:column; }
+    .bot-form  { grid-column:4; grid-row:3; padding-top:20px; display:flex; flex-direction:column; position:relative; z-index:20; }
     .form-group { margin-bottom:14px; }
     .form-group input {
       width:100%; border:none; border-bottom:1px solid #ccc;
@@ -167,12 +175,13 @@
       min-height: 52vw;
     }
 
-    /* relógio segue o scroll no mobile (não cobre o formulário) */
+    /* relógio segue o scroll no mobile — reposicionado via JS para dentro do clock-spacer */
     #clock-bg {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      display: none; /* JS move o canvas para dentro do clock-spacer no mobile */
     }
 
     /* INFO SECTION mobile */
@@ -241,9 +250,10 @@
 </head>
 <body>
 
-<div id="clock-bg"><canvas id="clock"></canvas></div>
-
 <div class="page">
+
+  <!-- ===================== CLOCK (desktop: dentro do grid | mobile: no clock-spacer) ===================== -->
+  <div id="clock-bg"><canvas id="clock"></canvas></div>
 
   <!-- ===================== HEADER ===================== -->
   <!-- desktop: top-brand + top-right ficam no grid -->
@@ -388,11 +398,34 @@ function clockDiff(){
 function sizeCanvas(){
   const sz = isMob()
     ? Math.min(window.innerWidth, window.innerHeight) * 0.86
-    : Math.min(window.innerWidth, window.innerHeight) * 0.9;
+    : Math.min(window.innerWidth, window.innerHeight) * 0.75;
   canvas.width = canvas.height = sz;
 }
+
+function placeCanvas(){
+  if(isMob()){
+    const spacer = document.querySelector('.clock-spacer');
+    if(spacer && !spacer.contains(canvas)){
+      spacer.appendChild(canvas);
+      canvas.style.position = 'absolute';
+      canvas.style.top = '50%';
+      canvas.style.left = '50%';
+      canvas.style.transform = 'translate(-50%, -50%)';
+    }
+  } else {
+    const clockBg = document.getElementById('clock-bg');
+    if(clockBg && !clockBg.contains(canvas)){
+      clockBg.appendChild(canvas);
+      canvas.style.position = '';
+      canvas.style.top = '';
+      canvas.style.left = '';
+      canvas.style.transform = '';
+    }
+  }
+}
+placeCanvas();
 sizeCanvas();
-window.addEventListener('resize', () => { sizeCanvas(); drawClock(); });
+window.addEventListener('resize', () => { placeCanvas(); sizeCanvas(); drawClock(); });
 
 function drawClock(){
   const sz = canvas.width;
