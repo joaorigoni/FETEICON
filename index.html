@@ -370,8 +370,8 @@ function daysLeftParis(){
 function getLabel(){
   const days = daysLeftParis();
   if      (days >= 2) return { counter: days + ' days left', days: days + ' days left' };
-  else if (days === 1) return { counter: 'AMANHÃ',           days: 'AMANHÃ' };
-  else                 return { counter: 'HOJE',             days: 'HOJE' };
+  else if (days === 1) return { counter: 'TOMORROW',           days: 'TOMORROW' };
+  else                 return { counter: 'TODAY',             days: 'TODAY' };
 }
 
 function updateCounter(){
